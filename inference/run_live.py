@@ -216,6 +216,7 @@ def main(
             import openai
             openai.api_key = os.environ.get("OPENAI_API_KEY", None)
             inputs = instance["text_inputs"]
+            logger.info(f"Calling OpenAI model with inputs: {inputs}")
             response, _ = call_chat(
                 model_name, inputs, use_azure=False, temperature=0, top_p=1
             )
@@ -246,6 +247,13 @@ def main(
         output_dir,
         f'{model_name}__{prompt_style}__{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.jsonl',
     )
+    input_file = Path(
+        output_dir,
+        f'input_{model_name}__{prompt_style}__{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.jsonl',
+    )
+    with open(input_file, "+a") as f:
+        f.write(inputs)
+    
     with open(output_file, "+a") as f:
         for output in outputs:
             print(json.dumps(output), file=f, flush=True)
